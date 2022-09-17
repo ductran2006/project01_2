@@ -26,32 +26,54 @@ public class UserController {
 	public String viewHomePage() {
 		return "index";
 	}
-	
+
+	@RequestMapping("/listUsers")
+	public String viewPage(Model model) {
+
+		return listByPage(model, 1);
+	}
+
+	@RequestMapping("/pageNumber/{pageNumber}")
+	public String listByPage(Model model, @PathVariable("pageNumber") int currentPage) {
+		Page<User> page = service.listAll(currentPage);
+		long totalItems = page.getTotalElements();
+		int totalPages = page.getTotalPages();
+
+		List<User> listUsers = page.getContent();
+
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalItems", totalItems);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("listUsers", listUsers);
+
+		return "listUsers";
+	}
+
 	@RequestMapping("/createUser")
 	public String showCreateUser(Model model) {
 		System.out.println("Show user login");
 		User user = new User();
-		model.addAttribute("user",user);
-		
+		model.addAttribute("user", user);
+
 		return "createUser";
 	}
-	
-	@RequestMapping(value="/save",method=RequestMethod.POST)
+
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String saveUser(@ModelAttribute("user") User user) {
 		service.save(user);
-		
+
 		return "redirect:/";
 	}
-	
+
 	@RequestMapping("/updateUser/{id}")
 	public ModelAndView showEditProductPage(@PathVariable(name = "id") int id) {
-	    ModelAndView mav = new ModelAndView("updateUser");
-	    User user = service.get(id);
-	    mav.addObject("user", user);
-	     
-	    return mav;
+		ModelAndView mav = new ModelAndView("updateUser");
+		User user = service.get(id);
+		mav.addObject("user", user);
+
+		return mav;
 	}
-	
+
 	@RequestMapping("/staffLogin")
 	public String showStaffLogin() {
 		System.out.println("Show staff login");
@@ -69,64 +91,4 @@ public class UserController {
 		System.out.println("Show user login");
 		return "userScreen";
 	}
-
-	@RequestMapping("/listUsers")
-	public String showListUsers(Model model, @Param("keyword") String keyword) {
-		System.out.println("Show user login");
-		List<User> listUsers = service.ListAll(keyword);
-		model.addAttribute("listUsers", listUsers);
-
-		return "listUsers";
-	}
-
 }
-
-/*
- * @RequestMapping("/") public String viewHomePage(Model model) { return
- * viewPage(model, 1, "firstname", "abc"); }
- * 
- * @RequestMapping("/page/{pageNum}") public String viewPage(Model
- * model, @PathVariable(name = "pageNum") int pageNum,
- * 
- * @Param("sortField") String sortField, @Param("sortDir") String sortDir) {
- * 
- * Page<User> page = service.listAll(pageNum, sortField, sortDir);
- * 
- * List<User> listUsers = page.getContent();
- * 
- * model.addAttribute("currentPage", pageNum); model.addAttribute("totalPages",
- * page.getTotalPages()); model.addAttribute("totalItems",
- * page.getTotalElements());
- * 
- * model.addAttribute("sortField", sortField); model.addAttribute("sortDir",
- * sortDir); model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc"
- * : "asc");
- * 
- * model.addAttribute("listProducts", listUsers);
- * 
- * return "index"; }
- * 
- * 
- * @RequestMapping("/new") public String showNewUserForm(Model model) { User
- * user = new User(); model.addAttribute("user", user);
- * 
- * return "user"; }
- * 
- * @RequestMapping(value = "/save", method = RequestMethod.POST) public String
- * saveUser(@ModelAttribute("product") User user) { service.save(user);
- * 
- * return "redirect:/"; }
- * 
- * @RequestMapping("/edit/{id}") public ModelAndView
- * showEditUserForm(@PathVariable(name = "id") Integer id) { ModelAndView mav =
- * new ModelAndView("edit_user");
- * 
- * User user = service.get(id); mav.addObject("user", user);
- * 
- * return mav; }
- * 
- * @RequestMapping("/delete/{id}") public String deleteUser(@PathVariable(name =
- * "id") Integer id) { service.delete(id);
- * 
- * return "redirect:/"; } }
- */

@@ -17,21 +17,13 @@ public class UserService {
 	@Autowired
 	private Userdao dao;
 
-	public List<User> ListAll(String keyword) {
-		if (keyword != null)
-			return dao.findAll(keyword);
-		return dao.findAll();
+	public Page<User> listAll(int pageNumber) {
+	   
+	    Pageable pageable = PageRequest.of(pageNumber-1, 5);
+	     
+	    return dao.findAll(pageable);
 	}
-
-	/*
-	 * public Page<User> listAll(int pageNum, String sortField, String sortDir) {
-	 * int pageSize = 5; Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
-	 * sortDir.equals("asc") ? Sort.by(sortField).ascending() :
-	 * Sort.by(sortField).descending() );
-	 * 
-	 * return dao.findAll(pageable); }
-	 */
-
+	
 	public void save(User user) {
 		dao.save(user);
 	}
